@@ -1,0 +1,262 @@
+import pygame
+import random
+
+# Initialize Pygame
+pygame.init()
+
+# Screen dimensions
+WIDTH, HEIGHT = 1200, 800
+
+# Colors
+BLUE = (70, 130, 180)
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BROWN = (139, 69, 19)
+
+# Initialize screen
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Fish and Sea Adventure")
+
+# Clock for controlling frame rate
+clock = pygame.time.Clock()
+FPS = 60
+
+# Load assets
+fish_image = pygame.image.load("fish.png")
+fish_image = pygame.transform.scale(fish_image, (60, 40))
+
+bubble_image = pygame.image.load("bubble.png")
+bubble_image = pygame.transform.scale(bubble_image, (20, 20))
+
+shark_image = pygame.image.load("shark.png")
+shark_image = pygame.transform.scale(shark_image, (80, 50))
+
+whale_image = pygame.image.load("whale.png")
+whale_image = pygame.transform.scale(whale_image, (150, 80))
+
+pirate_image = pygame.image.load("pirate.png")
+pirate_image = pygame.transform.scale(pirate_image, (70, 50))
+
+sailor_image = pygame.image.load("sailor.png")
+sailor_image = pygame.transform.scale(sailor_image, (50, 50))
+
+seaport_image = pygame.image.load("seaport.png")
+seaport_image = pygame.transform.scale(seaport_image, (100, 100))
+
+island_image = pygame.image.load("island.png")
+island_image = pygame.transform.scale(island_image, (200, 150))
+
+# Fish class
+class Fish(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = fish_image
+        self.rect = self.image.get_rect()
+        self.rect.center = (WIDTH // 2, HEIGHT // 2)
+        self.speed = 5
+
+    def update(self, keys):
+        if keys[pygame.K_UP] and self.rect.top > 0:
+            self.rect.y -= self.speed
+        if keys[pygame.K_DOWN] and self.rect.bottom < HEIGHT:
+            self.rect.y += self.speed
+        if keys[pygame.K_LEFT] and self.rect.left > 0:
+            self.rect.x -= self.speed
+        if keys[pygame.K_RIGHT] and self.rect.right < WIDTH:
+            self.rect.x += self.speed
+
+# Bubble class
+class Bubble(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = bubble_image
+        self.rect = self.image.get_rect()
+        self.rect.x = random.randint(0, WIDTH - self.rect.width)
+        self.rect.y = HEIGHT + random.randint(20, 100)
+        self.speed = random.randint(2, 6)
+
+    def update(self):
+        self.rect.y -= self.speed
+        if self.rect.bottom < 0:
+            self.rect.y = HEIGHT + random.randint(20, 100)
+            self.rect.x = random.randint(0, WIDTH - self.rect.width)
+
+# Shark class
+class Shark(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = shark_image
+        self.rect = self.image.get_rect()
+        self.rect.x = random.randint(0, WIDTH - self.rect.width)
+        self.rect.y = random.randint(0, HEIGHT // 2)
+        self.speed = random.randint(3, 7)
+
+    def update(self):
+        self.rect.x += self.speed
+        if self.rect.left > WIDTH:
+            self.rect.x = -self.rect.width
+            self.rect.y = random.randint(0, HEIGHT // 2)
+
+# Whale class
+class Whale(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = whale_image
+        self.rect = self.image.get_rect()
+        self.rect.x = random.randint(0, WIDTH - self.rect.width)
+        self.rect.y = random.randint(HEIGHT // 2, HEIGHT - self.rect.height)
+        self.speed = random.randint(2, 4)
+
+    def update(self):
+        self.rect.x -= self.speed
+        if self.rect.right < 0:
+            self.rect.x = WIDTH + self.rect.width
+            self.rect.y = random.randint(HEIGHT // 2, HEIGHT - self.rect.height)
+
+# Pirate class
+class Pirate(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = pirate_image
+        self.rect = self.image.get_rect()
+        self.rect.x = random.randint(0, WIDTH - self.rect.width)
+        self.rect.y = random.randint(0, HEIGHT - self.rect.height)
+        self.speed = random.randint(2, 4)
+
+    def update(self):
+        self.rect.x += random.choice([-1, 1]) * self.speed
+        self.rect.y += random.choice([-1, 1]) * self.speed
+
+        if self.rect.right < 0 or self.rect.left > WIDTH:
+            self.rect.x = random.randint(0, WIDTH - self.rect.width)
+        if self.rect.bottom < 0 or self.rect.top > HEIGHT:
+            self.rect.y = random.randint(0, HEIGHT - self.rect.height)
+
+# Sailor class
+class Sailor(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = sailor_image
+        self.rect = self.image.get_rect()
+        self.rect.x = random.randint(0, WIDTH - self.rect.width)
+        self.rect.y = random.randint(0, HEIGHT - self.rect.height)
+
+# Seaport class
+class Seaport(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = seaport_image
+        self.rect = self.image.get_rect()
+        self.rect.x = random.randint(100, WIDTH - 200)
+        self.rect.y = random.randint(100, HEIGHT - 200)
+
+# Sprite groups
+all_sprites = pygame.sprite.Group()
+bubbles = pygame.sprite.Group()
+sharks = pygame.sprite.Group()
+whales = pygame.sprite.Group()
+pirates = pygame.sprite.Group()
+sailors = pygame.sprite.Group()
+seaports = pygame.sprite.Group()
+islands = pygame.sprite.Group()
+
+fish = Fish()
+all_sprites.add(fish)
+
+for _ in range(20):
+    bubble = Bubble()
+    all_sprites.add(bubble)
+    bubbles.add(bubble)
+
+for _ in range(5):
+    shark = Shark()
+    all_sprites.add(shark)
+    sharks.add(shark)
+
+for _ in range(3):
+    whale = Whale()
+    all_sprites.add(whale)
+    whales.add(whale)
+
+for _ in range(2):
+    pirate = Pirate()
+    all_sprites.add(pirate)
+    pirates.add(pirate)
+
+for _ in range(3):
+    sailor = Sailor()
+    all_sprites.add(sailor)
+    sailors.add(sailor)
+
+for _ in range(2):
+    seaport = Seaport()
+    all_sprites.add(seaport)
+    seaports.add(seaport)
+
+for _ in range(2):
+    island = Island()
+    all_sprites.add(island)
+    islands.add(island)
+
+# Game loop
+running = True
+score = 0
+font = pygame.font.Font(None, 36)
+lives = 3
+
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+    keys = pygame.key.get_pressed()
+    all_sprites.update(keys=keys)
+
+    # Check for bubble collisions
+    hits = pygame.sprite.spritecollide(fish, bubbles, True)
+    for hit in hits:
+        score += 1
+        bubble = Bubble()
+        all_sprites.add(bubble)
+        bubbles.add(bubble)
+
+    # Check for shark collisions
+    if pygame.sprite.spritecollideany(fish, sharks):
+        lives -= 1
+        if lives <= 0:
+            running = False
+
+    # Check for pirate collisions
+    if pygame.sprite.spritecollideany(fish, pirates):
+        lives -= 1
+        if lives <= 0:
+            running = False
+
+    # Check for sailor rescues
+    rescued = pygame.sprite.spritecollide(fish, sailors, True)
+    for rescue in rescued:
+        score += 5
+
+    # Check for seaport docking
+    if pygame.sprite.spritecollideany(fish, seaports):
+        lives = min(lives + 1, 3)
+
+    # Drawing everything
+    screen.fill(BLUE)
+    all_sprites.draw(screen)
+
+    # Display score and lives
+    score_text = font.render(f"Score: {score}", True, WHITE)
+    lives_text = font.render(f"Lives: {lives}", True, RED)
+    screen.blit(score_text, (10, 10))
+    screen.blit(lives_text, (10, 50))
+
+    # Update the display
+    pygame.display.flip()
+
+    # Cap the frame rate
+    clock.tick(FPS)
+
+pygame.quit()
